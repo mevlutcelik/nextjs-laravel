@@ -1,6 +1,6 @@
 "use client";
 import {useState} from "react";
-import {post} from "@/utlis/request";
+import {post} from "@/lib/api";
 import useToken from "@/hooks/useToken";
 import {Button} from "@/components/ui/button";
 import {
@@ -24,16 +24,20 @@ export default function LogoutButton(){
         setLoading(true);
         try {
             const response = await post({
-                endpoint: 'logout',
+                endpoint: 'auth/logout',
                 bearerToken: token
             });
             if(response.status){
                 document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
                 location.href = '/';
                 setIsLogout(true)
+            } else {
+                // API'den hata mesajı geldi ama status false
+                alert(response.message || 'Çıkış yapılırken bir hata oluştu.');
             }
         }catch (e){
-            console.error(e);
+            // Network hatası veya başka bir hata
+            alert(e.message || 'Çıkış yapılırken bir hata oluştu. Lütfen tekrar deneyin.');
         }finally {
             setLoading(false);
         }

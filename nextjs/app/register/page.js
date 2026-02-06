@@ -1,7 +1,7 @@
 "use client";
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import {post} from "@/utlis/request"; // useRouter'ı next/navigation'dan alın
+import {post} from "@/lib/api";
 
 export default function Register() {
     const [name, setName] = useState('');
@@ -15,8 +15,8 @@ export default function Register() {
     const handleRegister = async (e) => {
         e.preventDefault();
         try {
-            const response = post({
-                endpoint: 'register',
+            const response = await post({
+                endpoint: 'auth/register',
                 body: {name, email, password}
             });
             if(response.status){
@@ -30,10 +30,10 @@ export default function Register() {
 
                 router.push('/dashboard'); // Yönlendirme burada gerçekleşiyor
             }else{
-                setMessage('Registration failed: ' + data.message);
+                setMessage('Registration failed: ' + response.message);
             }
         } catch (error) {
-            setMessage('Registration failed: ' + error.response.data.message);
+            setMessage('Registration failed: ' + (error.message || 'Unknown error'));
         }
     };
 

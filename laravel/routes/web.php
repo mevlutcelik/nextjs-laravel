@@ -8,7 +8,7 @@ Route::get('/', function () {
 
 Route::get('/login', function () {
     return response()->json([
-        'status' => false,
+        'status' => "error",
         'message' => 'You are logged out.',
-    ]);
+    ], 401);
 })->name('login');

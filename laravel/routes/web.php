@@ -9,6 +9,6 @@ Route::get('/', function () {
 Route::get('/login', function () {
     return response()->json([
         'status' => false,
-        'message' => 'Oturum kapalı'
+        'message' => 'You are logged out.',
     ]);
 })->name('login');

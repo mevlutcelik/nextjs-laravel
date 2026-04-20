@@ -1,6 +1,6 @@
 import { get } from '@/lib/api';
 
-export async function middleware(request) {
+export async function proxy(request) {
     const token = await request.cookies.get('token')?.value;
     const isLoginPage = request.nextUrl.pathname === '/';
     

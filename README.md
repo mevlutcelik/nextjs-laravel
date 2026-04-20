@@ -1,4 +1,4 @@
-> 🇹🇷 Türkçe dokümantasyon için [buraya tıklayın](#türkçe-versiyon)
+> 🇹🇷 Türkçe dokümantasyon için [buraya tıklayın](#-next-js--laravel-1)
 ---
 # 🇬🇧 Next JS + Laravel
 Next JS + Laravel Starter Kit
@@ -40,7 +40,7 @@ Next JS + Laravel Başlangıç Paketi
 ## Başlarken
 İlk olarak projeyi bilgisayarınıza klonlayın.
 ```bash
-git clone [https://github.com/mevlutcelik/nextjs-laravel.git](https://github.com/mevlutcelik/nextjs-laravel.git)
+git clone https://github.com/mevlutcelik/nextjs-laravel.git
 ```
 Ardından `nextjs` klasörüne girelim, bir `.env.local` dosyası oluşturalım, içine gerekli değişkenleri yazalım ve projenin bağımlılıklarını kuralım.
 ```bash

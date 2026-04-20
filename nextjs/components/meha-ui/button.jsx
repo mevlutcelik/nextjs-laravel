@@ -35,7 +35,7 @@ export const Button = forwardRef((
         ghost: 'text-primary hover:text-primary-hover hover:bg-primary/5',
         "ghost-gray": 'text-foreground hover:bg-muted',
         soft: 'bg-primary/5 text-primary hover:text-primary-hover hover:bg-primary/10',
-        secondary: 'shadow-sm border border-sidebar-border bg-background text-foreground hover:text-foreground/90 hover:bg-muted',
+        secondary: 'shadow-xs border border-sidebar-border bg-background text-foreground hover:text-foreground/90 hover:bg-muted',
         primary: 'shadow-md bg-primary text-background font-semibold'
     };
 
@@ -50,10 +50,10 @@ export const Button = forwardRef((
             lg: 'text-lg'
         },
         circle: {
-            xs: 'text-xs h-8 w-8 !rounded-full items-center justify-center',
-            sm: 'text-sm h-9 w-9 !rounded-full items-center justify-center',
-            md: 'text-base h-10 w-10 !rounded-full items-center justify-center',
-            lg: 'text-lg h-11 w-11 !rounded-full items-center justify-center'
+            xs: 'text-xs h-8 w-8 rounded-full! items-center justify-center',
+            sm: 'text-sm h-9 w-9 rounded-full! items-center justify-center',
+            md: 'text-base h-10 w-10 rounded-full! items-center justify-center',
+            lg: 'text-lg h-11 w-11 rounded-full! items-center justify-center'
         },
         default: {
             xs: 'text-xs px-3 py-2 sm:py-0 min-h-8',

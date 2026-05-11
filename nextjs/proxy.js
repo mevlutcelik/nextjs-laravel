@@ -1,11 +1,14 @@
 import { get } from '@/lib/api';
 
 export async function proxy(request) {
-    const token = await request.cookies.get('token')?.value;
-    const isLoginPage = request.nextUrl.pathname === '/';
-    
-    // Token yoksa ve login sayfasında değilse login'e yönlendir
-    if (!token && !isLoginPage) {
+    const token = request.cookies.get('token')?.value;
+
+    const pathname = request.nextUrl.pathname;
+
+    const isAuthPage = ['/', '/register'].includes(pathname);
+
+    // Token yoksa ve auth sayfasında değilse login'e yönlendir
+    if (!token && !isAuthPage) {
         return Response.redirect(new URL('/', request.url));
     }
 
@@ -17,42 +20,47 @@ export async function proxy(request) {
                 bearerToken: token,
             });
 
-            // Token geçersizse veya status false ise login'e yönlendir
-            if (!result.status && !isLoginPage) {
+            // Token geçersizse
+            if (!result.status && !isAuthPage) {
                 const response = Response.redirect(new URL('/', request.url));
-                // Cookie'yi temizle
+
                 response.cookies.delete('token');
+
                 return response;
             }
 
-            // Rol bazlı yönlendirme (kullanıcı giriş yapmışsa)
-            if (result.status) {
-                // Login sayfasındaysa dashboarda yönlendir
-                if (isLoginPage) {
-                    if (result.role === 'student') {
-                        return Response.redirect(new URL('/panel', request.url));
-                    } else {
-                        return Response.redirect(new URL('/dashboard', request.url));
-                    }
-                }
-
-                // Dashboard/Panel kontrolü
-                if (result.role !== 'student' && !request.nextUrl.pathname.startsWith('/dashboard')) {
-                    return Response.redirect(new URL('/dashboard', request.url));
-                }
-
-                if (result.role === 'student' && !request.nextUrl.pathname.startsWith('/panel')) {
+            // Kullanıcı giriş yapmışsa auth sayfalarını gösterme
+            if (result.status && isAuthPage) {
+                if (result.role === 'student') {
                     return Response.redirect(new URL('/panel', request.url));
                 }
+
+                return Response.redirect(new URL('/dashboard', request.url));
+            }
+
+            // Role bazlı erişim
+            if (
+                result.role !== 'student' &&
+                !pathname.startsWith('/dashboard')
+            ) {
+                return Response.redirect(new URL('/dashboard', request.url));
+            }
+
+            if (
+                result.role === 'student' &&
+                !pathname.startsWith('/panel')
+            ) {
+                return Response.redirect(new URL('/panel', request.url));
             }
 
         } catch (error) {
-            // API hatası durumunda (401, 403, vb.) login'e yönlendir
             console.error('Middleware auth error:', error.message);
-            if (!isLoginPage) {
+
+            if (!isAuthPage) {
                 const response = Response.redirect(new URL('/', request.url));
-                // Cookie'yi temizle
+
                 response.cookies.delete('token');
+
                 return response;
             }
         }
@@ -62,7 +70,7 @@ export async function proxy(request) {
 export const config = {
     matcher: [
         '/',
-        '/dashboard',
-        '/panel',
+        '/register',
+        '/dashboard/:path*'
     ],
-}
+};

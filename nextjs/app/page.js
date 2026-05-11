@@ -20,6 +20,8 @@ export default function DashboardLogin() {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
 
+    const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || "App Name";
+
     const handleLogin = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -79,15 +81,14 @@ export default function DashboardLogin() {
                         <form onSubmit={handleLogin} className="flex flex-col gap-12">
                             <div className="flex flex-col items-center gap-4 text-center">
                                 <div>
-                                    <h1 className="text-2xl font-bold">Finanz</h1>
-                                    <h2 className="text-lg font-bold">Best Jobs Germany</h2>
+                                    <h1 className="text-2xl font-bold">{APP_NAME}</h1>
                                 </div>
                                 <p className="text-balance text-sm text-muted-foreground">
-                                    Best Jobs Germany Finans'a giriş yapmak için eposta adresinizi ve şifrenizi girin
+                                    {APP_NAME} uygulamasına giriş yapmak için eposta adresinizi ve şifrenizi girin
                                 </p>
                             </div>
                             {message && (
-                                <Alert className="mb-4" variant={message.status ? "success" : "destructive"}>
+                                <Alert variant={message.status ? "success" : "destructive"}>
                                     {message.status ? (<CircleCheck className="h-4 w-4" />) : (
                                         <CircleAlert className="h-4 w-4" />)}
                                     <AlertTitle>{message.status ? "Başarılı" : "Hata"}</AlertTitle>
@@ -102,7 +103,7 @@ export default function DashboardLogin() {
                                         type="email"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
-                                        placeholder="ornek@bestjobsgermany.com"
+                                        placeholder={`ornek@${APP_NAME.toLowerCase()}.com`}
                                         required />
                                 </div>
                                 <div className="grid gap-2">

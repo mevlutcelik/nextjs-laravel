@@ -14,7 +14,7 @@ git clone https://github.com/mevlutcelik/nextjs-laravel.git
 ```
 Next, navigate into the `nextjs` folder, create a `.env.local` file, add the necessary variables to it, and install the project dependencies.
 ```bash
-cd nextjs && touch .env.local && echo "NEXT_PUBLIC_API_URL=http://localhost:8000/api" > .env.local && npm install
+cd nextjs && touch .env.local && echo -e "NEXT_PUBLIC_APP_NAME=Laravel\nNEXT_PUBLIC_API_URL=http://localhost:8000/api" > .env.local && npm install
 ```
 Then, go into the `laravel` folder, copy the `.env.example` file to `.env`, install the project dependencies, generate the application key, and run the database migrations.
 ```bash

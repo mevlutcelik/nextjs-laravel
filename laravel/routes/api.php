@@ -3,13 +3,22 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\UserController;
 
-Route::prefix('auth')->group(function () {
-    Route::group(['middleware' => 'auth:sanctum'], function () {
-        Route::get('/verify-token', [AuthController::class, 'verifyToken']);
-        Route::post('/logout', [AuthController::class, 'logout']);
+// Guest routes
+Route::middleware('guest')->group(function () {
+    // Authentication
+    Route::prefix('auth')->group(function () {
+        Route::post('/login', [AuthController::class, 'login']);
+        Route::post('/register', [AuthController::class, 'register']);
     });
+});
 
-    Route::post('/register', [AuthController::class, 'register']);
-    Route::post('/login', [AuthController::class, 'login']);
+// Authenticated routes
+Route::middleware('auth:sanctum')->group(function () {
+    //
+
+    Route::get('/profile', [UserController::class, 'index']);
+    Route::get('auth/verify-token', [AuthController::class, 'verifyToken']);
+    Route::post('/logout', [AuthController::class, 'logout']);
 });

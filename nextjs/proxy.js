@@ -1,76 +1,88 @@
+import { NextResponse } from 'next/server';
 import { get } from '@/lib/api';
 
 export async function proxy(request) {
+    const { pathname } = request.nextUrl;
     const token = request.cookies.get('token')?.value;
 
-    const pathname = request.nextUrl.pathname;
-
-    const isAuthPage = ['/', '/register'].includes(pathname);
-
-    // Token yoksa ve auth sayfasında değilse login'e yönlendir
-    if (!token && !isAuthPage) {
-        return Response.redirect(new URL('/', request.url));
+    // 1. Statik dosyaları ve API rotalarını anında geç
+    if (
+        pathname.startsWith('/_next') || 
+        pathname.startsWith('/static') || 
+        pathname.includes('.')
+    ) {
+        return NextResponse.next();
     }
 
-    // Token varsa doğrula
-    if (token) {
-        try {
-            const result = await get({
-                endpoint: 'auth/verify-token',
-                bearerToken: token,
-            });
+    const isAuthPage = pathname === '/' || pathname === '/register';
 
-            // Token geçersizse
-            if (!result.status && !isAuthPage) {
-                const response = Response.redirect(new URL('/', request.url));
+    // 2. Token YOKSA: Sadece login/register'a izin ver
+    if (!token) {
+        if (isAuthPage) return NextResponse.next();
+        return NextResponse.redirect(new URL('/', request.url));
+    }
 
+    try {
+        // 3. Token VARSA: Kendi API fonksiyonun ile doğrula
+        const result = await get({
+            endpoint: 'auth/verify-token',
+            bearerToken: token,
+        });
+
+        // 4. Token GEÇERSİZSE veya API hata döndürdüyse
+        if (!result || !result.status) {
+            // DÖNGÜ KIRICI: Zaten '/' sayfasındaysa tekrar '/' sayfasına yönlendirme!
+            if (isAuthPage) {
+                const response = NextResponse.next();
                 response.cookies.delete('token');
-
+                return response;
+            } else {
+                const response = NextResponse.redirect(new URL('/', request.url));
+                response.cookies.delete('token');
                 return response;
             }
+        }
 
-            // Kullanıcı giriş yapmışsa auth sayfalarını gösterme
-            if (result.status && isAuthPage) {
-                if (result.role === 'student') {
-                    return Response.redirect(new URL('/panel', request.url));
-                }
+        // 5. Token GEÇERLİYSE: Rolleri al
+        const userRole = result.role;
 
-                return Response.redirect(new URL('/dashboard', request.url));
-            }
+        // Giriş yapmış birisi '/' veya '/register' sayfasına gelirse:
+        if (isAuthPage) {
+            const targetPath = userRole === 'student' ? '/panel' : '/dashboard';
+            return NextResponse.redirect(new URL(targetPath, request.url));
+        }
 
-            // Role bazlı erişim
-            if (
-                result.role !== 'student' &&
-                !pathname.startsWith('/dashboard')
-            ) {
-                return Response.redirect(new URL('/dashboard', request.url));
-            }
+        // Yanlış panelde ise doğru panele yönlendir
+        if (userRole === 'student' && pathname.startsWith('/dashboard')) {
+            return NextResponse.redirect(new URL('/panel', request.url));
+        } 
+        
+        if (userRole !== 'student' && pathname.startsWith('/panel')) {
+            return NextResponse.redirect(new URL('/dashboard', request.url));
+        }
 
-            if (
-                result.role === 'student' &&
-                !pathname.startsWith('/panel')
-            ) {
-                return Response.redirect(new URL('/panel', request.url));
-            }
+        // Her şey yolundaysa isteğin geçmesine izin ver
+        return NextResponse.next();
 
-        } catch (error) {
-            console.error('Middleware auth error:', error.message);
-
-            if (!isAuthPage) {
-                const response = Response.redirect(new URL('/', request.url));
-
-                response.cookies.delete('token');
-
-                return response;
-            }
+    } catch (error) {
+        console.error("Proxy Hatası:", error.message);
+        
+        // Sunucu bağlantısı koparsa veya beklenmedik bir hata olursa:
+        if (isAuthPage) {
+            const response = NextResponse.next();
+            response.cookies.delete('token');
+            return response;
+        } else {
+            const response = NextResponse.redirect(new URL('/', request.url));
+            response.cookies.delete('token');
+            return response;
         }
     }
 }
 
+// 6. Matcher
 export const config = {
     matcher: [
-        '/',
-        '/register',
-        '/dashboard/:path*'
+        '/((?!api|_next/static|_next/image|favicon.ico).*)',
     ],
 };

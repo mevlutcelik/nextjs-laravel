@@ -19,6 +19,9 @@ Route::middleware('auth:sanctum')->group(function () {
     //
 
     Route::get('/profile', [UserController::class, 'index']);
-    Route::get('auth/verify-token', [AuthController::class, 'verifyToken']);
-    Route::post('/logout', [AuthController::class, 'logout']);
+
+    Route::prefix('auth')->group(function () {
+        Route::get('/verify-token', [AuthController::class, 'verifyToken']);
+        Route::post('/logout', [AuthController::class, 'logout']);
+    });
 });

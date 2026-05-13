@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { post } from "@/lib/api";
+import { Button as Button2 } from "@/components/ui/button"
 import { Button } from "@/components/meha-ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { CircleAlert, CircleCheck, QrCode } from "lucide-react";
@@ -12,6 +13,7 @@ import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { Logo } from "@/components/meha-ui/logo";
 import { toast } from "sonner"
 import Image from "next/image";
+import Loading from "@/components/meha-ui/loading";
 
 export default function DashboardLogin() {
     const [email, setEmail] = useState("");
@@ -26,18 +28,18 @@ export default function DashboardLogin() {
         e.preventDefault();
         setLoading(true);
         setMessage(null); // Önceki mesajları temizle
-        
+
         try {
             const response = await post({
                 endpoint: "auth/login",
                 body: { email, password },
             });
-            
+
             Toast.fire({
                 icon: response.status ? "success" : "error",
                 title: response.message,
             });
-            
+
             if (response.status) {
                 // Token'ı sınırsız süreli cookie olarak ayarlayın
                 const expirationDate = new Date();
@@ -68,11 +70,9 @@ export default function DashboardLogin() {
             <div className="flex flex-col gap-4 p-4 md:p-10">
                 <div className='flex items-center justify-between'>
                     <div className="flex justify-center gap-2 md:justify-start">
-                        <a href="#" className="flex items-center gap-3 font-medium">
-                            <div className='text-primary absolute top-2 left-2 md:top-6 md:left-6'>
-                                <Logo />
-                            </div>
-                        </a>
+                        <div className='text-primary absolute top-2 left-2 md:top-6 md:left-6'>
+                            <Logo />
+                        </div>
                     </div>
                     <ThemeToggle />
                 </div>
@@ -81,7 +81,7 @@ export default function DashboardLogin() {
                         <form onSubmit={handleLogin} className="flex flex-col gap-12">
                             <div className="flex flex-col items-center gap-4 text-center">
                                 <div>
-                                    <h1 className="text-2xl font-bold">{APP_NAME}</h1>
+                                    <h1 className="font-heading text-4xl">{APP_NAME}</h1>
                                 </div>
                                 <p className="text-balance text-sm text-muted-foreground">
                                     {APP_NAME} uygulamasına giriş yapmak için eposta adresinizi ve şifrenizi girin
@@ -136,16 +136,10 @@ export default function DashboardLogin() {
                                         onChange={(e) => setPassword(e.target.value)}
                                         required />
                                 </div>
-                                <Button
-                                    htmlType="submit"
-                                    size="sm"
-                                    disabled={loading}
-                                    loading={loading}
-                                    loadingColor='white'
-                                    className="justify-center"
-                                >
-                                    Giriş Yap
-                                </Button>
+                                <Button2 type="submit" size="lg" disabled={loading} className="cursor-pointer">
+                                    {loading && <Loading size="xs" color="white" />}
+                                    {!loading && "Giriş Yap"}
+                                </Button2>
                                 {/* <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
                                     <span className="relative z-10 bg-background px-2 text-muted-foreground">
                                         Or continue with

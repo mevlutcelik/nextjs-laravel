@@ -48,7 +48,7 @@ export default function Layout({ children }) {
                             links: [
                                 {
                                     title: "Profile",
-                                    href: "/profile",
+                                    href: "/dashboard/profile",
                                     icon: User,
                                 },
                                 {

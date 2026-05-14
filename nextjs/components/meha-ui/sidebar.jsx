@@ -4,6 +4,7 @@ import {
   createContext,
   useContext,
   useState,
+  useEffect,
 } from "react"
 
 import Link from "next/link"
@@ -43,6 +44,13 @@ export function Sidebar({
 }) {
   const { open, setOpen } = useSidebar()
   const isMobile = useIsMobile()
+  const pathname = usePathname()
+
+  useEffect(() => {
+    if (isMobile) {
+      setOpen(false)
+    }
+  }, [pathname])
 
   return (
     <div className="bg-sidebar">
